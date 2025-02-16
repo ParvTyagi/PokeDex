@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pokédex</title>
+    <link href="style.css" rel="stylesheet">
+    <link rel="icon" type="image/png" href="icon.jpg">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+</head>
+<body>
+    <header>
+        <div class="Logo">Pokedex</div>
+    </header>
+    <main>
+        <div class="Main">
+            <div class="nav_bar">
+                <div class="nav_opt"><i class="fa-solid fa-house"></i><a href="#"> Home</a></div>
+                <div class="nav_opt"><i class="fa-solid fa-film"></i><a href="#"> Season & Episodes</a></div>
+                <div class="nav_opt"><i class="fa-regular fa-heart"></i><a href="#favorites"> Favorites</a></div>
+            </div>
+            <div class="main_bar">
+                <div class="search-container">
+                    <h1>What Pokemon are you looking for?</h1>
+                    <form id="pokemonSearchForm">
+                        <div class="search-wrapper">
+                            <i class="fa-solid fa-search search-icon"></i>
+                            <input type="search" name="search" id="pokemonInput" placeholder="Search Pokemon" autocomplete="off">
+                        </div>
+                    </form>
+                </div>
+
+                <div class="categories">
+                    <div class="category-card pokedex">
+                        <i class="fas fa-book"></i>
+                        <span>Pokedex</span>
+                    </div>
+                    <div class="category-card moves">
+                        <i class="fas fa-bolt"></i>
+                        <span>Moves</span>
+                    </div>
+                    <div class="category-card evolutions">
+                        <i class="fas fa-dna"></i>
+                        <span>Evolutions</span>
+                    </div>
+                    <div class="category-card locations">
+                        <i class="fas fa-map-marker-alt"></i>
+                        <span>Locations</span>
+                    </div>
+                </div>
+
+                <!-- Add Favorites List Container -->
+                <div class="favorites-list" style="display: none;">
+                    <h2>Your Favorite Pokemon</h2>
+                    <!-- Favorite Pokemon cards will be added here dynamically -->
+                </div>
+
+                <section class="watch-section">
+                    <h2>Watch</h2>
+                    <div class="episodes-grid">
+                        <div class="episode-card">
+                            <div class="thumbnail">
+                                <i class="fa-solid fa-play"></i>
+                                <img src="https://assets.pokemon.com/assets/cms2/img/watch-pokemon-tv/seasons/season24/season24_ep01_ss01.jpg" alt="Pokemon Episode">
+                            </div>
+                            <h3>Pokemon Master Journeys: The Series</h3>
+                            <p>2021 | Series | 10 EP</p>
+                        </div>
+                    </div>
+                </section>
+
+                <div id="pokemonDetails" style="display: none;">
+                    <section>
+                        <div class="details">
+                            <div class="pokemon-image-container">
+                                <img id="pokemonImage" src="" alt="Pokemon Image">
+                            </div>
+                            <div class="pokemon-info">
+                                <div class="pokemon-header">
+                                    <h1 id="pokemonName"></h1>
+                                    <p id="pokemonID"></p>
+                                </div>
+                                <div id="evolutions"></div>
+                                <div class="pokemon-attributes">
+                                    <div id="types"></div>
+                                    <div id="stats"></div>
+                                </div>
+                                <div id="attacks">
+                                    <h2>Attacks</h2>
+                                    <ul></ul>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+                </div>
+            </div>
+        </div>
+    </main>
+    <script src="script.js"></script>
+</body>
+</html>
