@@ -177,15 +177,21 @@ document.addEventListener('DOMContentLoaded', function() {
 
             const evolutionCard = document.createElement('div');
             evolutionCard.className = 'evolution-card';
+            evolutionCard.style.cursor = 'pointer';
+            evolutionCard.addEventListener('click', () => searchPokemon(pokemon.name));
+
             evolutionCard.innerHTML = `
                 <img src="${pokemon.sprites.front_default}" alt="${pokemon.name}">
                 <div>${pokemon.name}</div>
-                ${chain.evolves_to.length > 0 ? '<i class="fas fa-arrow-right evolution-arrow"></i>' : ''}
             `;
 
             container.appendChild(evolutionCard);
 
             if (chain.evolves_to.length > 0) {
+                const arrowDiv = document.createElement('div');
+                arrowDiv.className = 'evolution-arrow';
+                arrowDiv.innerHTML = '<i class="fas fa-arrow-right"></i>';
+                container.appendChild(arrowDiv);
                 await displayEvolutionChain(chain.evolves_to[0], container);
             }
         } catch (error) {
@@ -208,7 +214,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         ${locations.length ? locations.map(loc => `
                             <div class="location-card">
                                 <i class="fas fa-map-marker-alt"></i>
-                                <span>${loc.location_area.name.replace('-', ' ')}</span>
+                                <span>${loc.location_area.name.replace(/-/g, ' ')}</span>
                             </div>
                         `).join('') : '<p class="no-locations">No location data available</p>'}
                     </div>
