@@ -13,7 +13,7 @@ document.addEventListener('DOMContentLoaded', function() {
     async function searchPokemon(pokemonName) {
         try {
             pokemonDetails.classList.add('loading');
-            const response = await fetch(`https://pokeapi.co/api/v2/pokemon/${pokemonName}`);
+            const response = await fetch(`https://pokeapi.co/api/v2/pokemon/${pokemonName.toLowerCase()}`);
             if (!response.ok) throw new Error('Pokemon not found');
 
             const data = await response.json();
@@ -30,7 +30,6 @@ document.addEventListener('DOMContentLoaded', function() {
         } catch (error) {
             showError(error.message);
             currentPokemon = null;
-            // Show categories and watch section back if there's an error
             categoriesContainer.style.display = 'grid';
             watchSection.style.display = 'block';
         } finally {
@@ -50,6 +49,13 @@ document.addEventListener('DOMContentLoaded', function() {
                 </button>
             </div>
         `;
+
+        // Add click event for favorite button
+        const favoriteButton = header.querySelector('.favorite-button');
+        favoriteButton.addEventListener('click', (e) => {
+            e.preventDefault();
+            toggleFavorite(pokemon);
+        });
     }
 
     // Category click handlers
@@ -58,12 +64,17 @@ document.addEventListener('DOMContentLoaded', function() {
         showPokedexDetails(currentPokemon);
     });
 
+    document.querySelector('.category-card.moves').addEventListener('click', function() {
+        if (!currentPokemon) return;
+        showMoveDetails(currentPokemon);
+    });
+
     document.querySelector('.category-card.evolutions').addEventListener('click', function() {
         if (!currentPokemon) return;
         showEvolutionDetails(currentPokemon.id);
     });
 
-    document.querySelector('.category-card.locations').addEventListener('click', async function() {
+    document.querySelector('.category-card.locations').addEventListener('click', function() {
         if (!currentPokemon) return;
         showLocationDetails(currentPokemon.id);
     });
@@ -91,18 +102,44 @@ document.addEventListener('DOMContentLoaded', function() {
                                 </div>
                             `).join('')}
                         </div>
-                        <div id="attacks">
-                            <h2>Attacks</h2>
-                            <ul>
-                                ${pokemon.moves.slice(0, 12).map(move => 
-                                    `<li>${move.move.name.replace('-', ' ')}</li>`
-                                ).join('')}
-                            </ul>
-                        </div>
                     </div>
                 </div>
             </section>
         `;
+    }
+
+    async function showMoveDetails(pokemon) {
+        pokemonDetails.style.display = 'block';
+        pokemonDetails.innerHTML = '<div class="loading-spinner"></div>';
+
+        try {
+            const movePromises = pokemon.moves.slice(0, 12).map(async move => {
+                const response = await fetch(move.move.url);
+                return await response.json();
+            });
+
+            const moves = await Promise.all(movePromises);
+
+            pokemonDetails.innerHTML = `
+                <section>
+                    <h2>Moves</h2>
+                    <div class="moves-grid">
+                        ${moves.map(move => `
+                            <div class="move-card">
+                                <h3>${move.name.replace('-', ' ')}</h3>
+                                <div class="move-details">
+                                    <p>Power: ${move.power || 'N/A'}</p>
+                                    <p>Accuracy: ${move.accuracy || 'N/A'}</p>
+                                    <p>PP: ${move.pp}</p>
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                </section>
+            `;
+        } catch (error) {
+            showError('Error loading move details');
+        }
     }
 
     async function showEvolutionDetails(pokemonId) {
@@ -118,13 +155,41 @@ document.addEventListener('DOMContentLoaded', function() {
 
             pokemonDetails.innerHTML = `
                 <section>
-                    <div class="evolution-chain" id="evolutionChain"></div>
+                    <h2>Evolution Chain</h2>
+                    <div class="evolution-chain"></div>
                 </section>
             `;
 
-            await displayEvolutionChain(evolutionData.chain, document.getElementById('evolutionChain'));
+            const chain = evolutionData.chain;
+            const evolutionChainDiv = pokemonDetails.querySelector('.evolution-chain');
+            await displayEvolutionChain(chain, evolutionChainDiv);
         } catch (error) {
             showError('Error loading evolution data');
+        }
+    }
+
+    async function displayEvolutionChain(chain, container) {
+        if (!chain) return;
+
+        try {
+            const response = await fetch(`https://pokeapi.co/api/v2/pokemon/${chain.species.name}`);
+            const pokemon = await response.json();
+
+            const evolutionCard = document.createElement('div');
+            evolutionCard.className = 'evolution-card';
+            evolutionCard.innerHTML = `
+                <img src="${pokemon.sprites.front_default}" alt="${pokemon.name}">
+                <div>${pokemon.name}</div>
+                ${chain.evolves_to.length > 0 ? '<i class="fas fa-arrow-right evolution-arrow"></i>' : ''}
+            `;
+
+            container.appendChild(evolutionCard);
+
+            if (chain.evolves_to.length > 0) {
+                await displayEvolutionChain(chain.evolves_to[0], container);
+            }
+        } catch (error) {
+            console.error('Error displaying evolution:', error);
         }
     }
 
@@ -138,14 +203,14 @@ document.addEventListener('DOMContentLoaded', function() {
 
             pokemonDetails.innerHTML = `
                 <section>
-                    <div class="locations-list">
-                        <h2>Found in Locations:</h2>
+                    <h2>Locations</h2>
+                    <div class="locations-grid">
                         ${locations.length ? locations.map(loc => `
-                            <div class="location-item">
+                            <div class="location-card">
                                 <i class="fas fa-map-marker-alt"></i>
-                                ${loc.location_area.name.replace('-', ' ')}
+                                <span>${loc.location_area.name.replace('-', ' ')}</span>
                             </div>
-                        `).join('') : '<p>No location data available</p>'}
+                        `).join('') : '<p class="no-locations">No location data available</p>'}
                     </div>
                 </section>
             `;
@@ -154,7 +219,43 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-    // Rest of the code (searchForm event listener, toggleFavorite, etc.) remains the same
+    // Favorites functionality
+    window.toggleFavorite = function(pokemon) {
+        const index = favorites.findIndex(f => f.id === pokemon.id);
+        if (index === -1) {
+            favorites.push({
+                id: pokemon.id,
+                name: pokemon.name,
+                image: pokemon.sprites.other['official-artwork'].front_default || pokemon.sprites.front_default
+            });
+        } else {
+            favorites.splice(index, 1);
+        }
+        localStorage.setItem('pokemonFavorites', JSON.stringify(favorites));
+        updatePokemonHeader(pokemon);
+        updateFavoritesList();
+    };
+
+    function updateFavoritesList() {
+        if (favoritesContainer) {
+            favoritesContainer.innerHTML = `
+                <h2>Your Favorite Pokemon</h2>
+                <div class="favorites-grid">
+                    ${favorites.map(pokemon => `
+                        <div class="favorite-card" onclick="searchPokemon('${pokemon.name}')">
+                            <img src="${pokemon.image}" alt="${pokemon.name}">
+                            <span>${pokemon.name}</span>
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+        }
+    }
+
+    // Initialize favorites list
+    updateFavoritesList();
+
+    // Search form handler
     searchForm.addEventListener('submit', async function(e) {
         e.preventDefault();
         const pokemonName = pokemonInput.value.toLowerCase().trim();
@@ -173,41 +274,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
-    // Favorites functionality
-    function toggleFavorite(pokemon) {
-        const index = favorites.findIndex(fav => fav.id === pokemon.id);
-        if (index === -1) {
-            favorites.push({
-                id: pokemon.id,
-                name: pokemon.name,
-                image: pokemon.sprites.other['official-artwork'].front_default || pokemon.sprites.front_default
-            });
-        } else {
-            favorites.splice(index, 1);
-        }
-        localStorage.setItem('pokemonFavorites', JSON.stringify(favorites));
-        updatePokemonHeader(pokemon);
-        updateFavoritesList();
-    }
-
-    function updateFavoritesList() {
-        if (favoritesContainer) {
-            favoritesContainer.innerHTML = `
-                <h2>Your Favorite Pokemon</h2>
-                ${favorites.map(pokemon => `
-                    <div class="favorite-card" onclick="searchPokemon('${pokemon.name}')">
-                        <img src="${pokemon.image}" alt="${pokemon.name}">
-                        <span>${pokemon.name}</span>
-                    </div>
-                `).join('')}
-            `;
-        }
-    }
-
-    // Initialize favorites list
-    updateFavoritesList();
-
-    // Favorites navigation
+    // Navigation
     document.querySelector('.nav_opt a[href="#favorites"]').addEventListener('click', function(e) {
         e.preventDefault();
         pokemonDetails.style.display = 'none';
@@ -216,32 +283,13 @@ document.addEventListener('DOMContentLoaded', function() {
         favoritesContainer.style.display = 'grid';
     });
 
-    async function displayEvolutionChain(chain, container) {
-        if (!chain) return;
-
-        try {
-            const response = await fetch(`https://pokeapi.co/api/v2/pokemon/${chain.species.name}`);
-            const pokemon = await response.json();
-
-            const evolutionCard = document.createElement('div');
-            evolutionCard.className = 'evolution-card';
-            evolutionCard.style.cursor = 'pointer';
-            evolutionCard.addEventListener('click', () => searchPokemon(pokemon.name));
-
-            evolutionCard.innerHTML = `
-                <img src="${pokemon.sprites.front_default}" alt="${pokemon.name}">
-                <div>${pokemon.name}</div>
-            `;
-
-            container.appendChild(evolutionCard);
-
-            if (chain.evolves_to.length > 0) {
-                await displayEvolutionChain(chain.evolves_to[0], container);
-            }
-        } catch (error) {
-            console.error('Error displaying evolution:', error);
-        }
-    }
+    document.querySelector('.nav_opt a[href="#"]').addEventListener('click', function(e) {
+        e.preventDefault();
+        pokemonDetails.style.display = 'none';
+        categoriesContainer.style.display = 'grid';
+        watchSection.style.display = 'block';
+        favoritesContainer.style.display = 'none';
+    });
 
     function showError(message) {
         const errorDiv = document.createElement('div');
