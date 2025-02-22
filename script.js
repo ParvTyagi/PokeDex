@@ -3,22 +3,27 @@ document.addEventListener("DOMContentLoaded", function () {
     toggleButton.style.position = "fixed";
     toggleButton.style.top = "20px";
     toggleButton.style.right = "20px";
-    toggleButton.style.padding = "10px 15px";
-    toggleButton.style.borderRadius = "8px";
+    toggleButton.style.width = "50px"; // Bigger button
+    toggleButton.style.height = "50px";
+    toggleButton.style.borderRadius = "50%"; // Circular shape
     toggleButton.style.border = "none";
     toggleButton.style.cursor = "pointer";
+    toggleButton.style.fontSize = "32px"; // Bigger icon
+    toggleButton.style.display = "flex";
+    toggleButton.style.alignItems = "center";
+    toggleButton.style.justifyContent = "center";
     toggleButton.style.transition = "background-color 0.3s ease, color 0.3s ease";
     document.body.appendChild(toggleButton);
 
     function updateButtonStyle() {
         if (document.body.classList.contains("light-mode")) {
-            toggleButton.style.backgroundColor = "rgba(181, 104, 72, 0.57)";  // Dark red for contrast
+            toggleButton.style.backgroundColor = "rgb(138, 50, 50)"; // Dark red
             toggleButton.style.color = "white";
-            toggleButton.textContent = " 🌞 Light Mode"; // Sun symbol
+            toggleButton.textContent = "🌙"; // Moon symbol
         } else {
-            toggleButton.style.backgroundColor = "#ddd";  // Light gray for dark mode
+            toggleButton.style.backgroundColor = "#ddd"; // Light gray
             toggleButton.style.color = "black";
-            toggleButton.textContent = " 🌙 Dark Mode"; // Moon symbol
+            toggleButton.textContent = "🌞"; // Sun symbol
         }
     }
 
@@ -31,7 +36,6 @@ document.addEventListener("DOMContentLoaded", function () {
     toggleButton.addEventListener("click", function () {
         document.body.classList.toggle("light-mode");
 
-        // Save preference
         if (document.body.classList.contains("light-mode")) {
             localStorage.setItem("theme", "light");
         } else {
