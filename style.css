@@ -1,11 +1,24 @@
 /* Base Styles */
 body {
-    background-color: rgb(2, 4, 3);
+    background-color:rgb(27, 27, 27);
     color: white;
     margin: 0;
     font-family: system-ui, -apple-system, sans-serif;
     min-height: 100vh;
     padding: 20px;
+}
+.L{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.Logo{
+    height: 57px;
+    width: 180px;
+    background-image: url(Logo.png);
+    background-size: cover;
+  
 }
 
 /* Header */
@@ -13,11 +26,7 @@ header {
     margin-bottom: 30px;
 }
 
-header .Logo {
-    font-size: 24px;
-    font-weight: bold;
-    color: white;
-}
+
 
 /* Search Container */
 .search-container {
@@ -506,6 +515,11 @@ header .Logo {
 
 /* Media Queries */
 @media (max-width: 768px) {
+    .L{
+        display: flex;
+        justify-content: center;
+    }
+    
     body {
         padding: 10px;
     }
@@ -528,6 +542,7 @@ header .Logo {
         flex-direction: row;
         position: static;
         margin-bottom: 15px;
+        justify-content: space-around;
     }
 
     .search form {

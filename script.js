@@ -1,4 +1,96 @@
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener("DOMContentLoaded", function () {
+    const toggleButton = document.createElement("button");
+    toggleButton.style.position = "fixed";
+    toggleButton.style.top = "20px";
+    toggleButton.style.right = "20px";
+    toggleButton.style.padding = "10px 15px";
+    toggleButton.style.borderRadius = "8px";
+    toggleButton.style.border = "none";
+    toggleButton.style.cursor = "pointer";
+    toggleButton.style.transition = "background-color 0.3s ease, color 0.3s ease";
+    document.body.appendChild(toggleButton);
+
+    function updateButtonStyle() {
+        if (document.body.classList.contains("light-mode")) {
+            toggleButton.style.backgroundColor = "rgba(181, 104, 72, 0.57)";  // Dark red for contrast
+            toggleButton.style.color = "white";
+            toggleButton.textContent = " 🌞 Light Mode"; // Sun symbol
+        } else {
+            toggleButton.style.backgroundColor = "#ddd";  // Light gray for dark mode
+            toggleButton.style.color = "black";
+            toggleButton.textContent = " 🌙 Dark Mode"; // Moon symbol
+        }
+    }
+
+    // Load saved theme preference
+    if (localStorage.getItem("theme") === "light") {
+        document.body.classList.add("light-mode");
+    }
+    updateButtonStyle(); // Apply correct button style on load
+
+    toggleButton.addEventListener("click", function () {
+        document.body.classList.toggle("light-mode");
+
+        // Save preference
+        if (document.body.classList.contains("light-mode")) {
+            localStorage.setItem("theme", "light");
+        } else {
+            localStorage.setItem("theme", "dark");
+        }
+
+        updateButtonStyle(); // Update button styles dynamically
+    });
+});
+
+const style = document.createElement("style");
+style.innerHTML = `
+    .light-mode {
+        background: rgb(251, 223, 173) !important;
+        transition: background 0.3s ease, color 0.3s ease;
+    }
+    .light-mode * {
+        color: black !important;
+    }
+    .light-mode .nav_bar {
+        background: rgba(138, 50, 50, 0.13) !important;
+        box-shadow: 10px 10px 10px rgba(0, 0, 0, 0.2);
+    }
+    .light-mode .nav_opt {
+        background-color: rgba(255, 255, 255, 0.8) !important;
+        border-radius: 10px;
+        padding: 10px;
+        box-shadow: 10px 10px 10px rgba(0, 0, 0, 0.2);    
+    }
+    .light-mode .nav_opt:hover {
+        background-color: rgb(251, 223, 173) !important;
+    }
+    .light-mode .search-container {
+        box-shadow: 10px 10px 10px rgba(0, 0, 0, 0.2);
+        background: rgba(138, 50, 50, 0.13) !important;
+        border: 1px solid #ccc !important;
+        padding: 10px;
+        border-radius: 25px;
+    }
+    .light-mode .search-container input {
+        background: #fff !important;
+        border: 1px solid #ddd !important;
+        padding: 8px;
+        border-radius: 5px;
+    }
+    .light-mode .category-card {
+        box-shadow: 10px 10px 10px rgba(0, 0, 0, 0.2);
+    }
+    .light-mode .stats-grid,
+    .light-mode .move-card,
+    .light-mode .location-card,
+    .light-mode .evolution-card {
+        background: rgba(138, 50, 50, 0.1);
+    }
+`;
+document.head.appendChild(style);
+
+    
+document.addEventListener('DOMContentLoaded', function () {
     const searchForm = document.getElementById('pokemonSearchForm');
     const pokemonInput = document.getElementById('pokemonInput');
     const pokemonDetails = document.getElementById('pokemonDetails');
@@ -59,22 +151,22 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // Category click handlers
-    document.querySelector('.category-card.pokedex').addEventListener('click', function() {
+    document.querySelector('.category-card.pokedex').addEventListener('click', function () {
         if (!currentPokemon) return;
         showPokedexDetails(currentPokemon);
     });
 
-    document.querySelector('.category-card.moves').addEventListener('click', function() {
+    document.querySelector('.category-card.moves').addEventListener('click', function () {
         if (!currentPokemon) return;
         showMoveDetails(currentPokemon);
     });
 
-    document.querySelector('.category-card.evolutions').addEventListener('click', function() {
+    document.querySelector('.category-card.evolutions').addEventListener('click', function () {
         if (!currentPokemon) return;
         showEvolutionDetails(currentPokemon.id);
     });
 
-    document.querySelector('.category-card.locations').addEventListener('click', function() {
+    document.querySelector('.category-card.locations').addEventListener('click', function () {
         if (!currentPokemon) return;
         showLocationDetails(currentPokemon.id);
     });
@@ -90,9 +182,9 @@ document.addEventListener('DOMContentLoaded', function() {
                     </div>
                     <div class="pokemon-info">
                         <div id="types" class="flex gap-2 justify-center">
-                            ${pokemon.types.map(type => 
-                                `<span class="type-badge">${type.type.name}</span>`
-                            ).join('')}
+                            ${pokemon.types.map(type =>
+            `<span class="type-badge">${type.type.name}</span>`
+        ).join('')}
                         </div>
                         <div id="stats" class="stats-grid">
                             ${pokemon.stats.map(stat => `
@@ -226,7 +318,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // Favorites functionality
-    window.toggleFavorite = function(pokemon) {
+    window.toggleFavorite = function (pokemon) {
         const index = favorites.findIndex(f => f.id === pokemon.id);
         if (index === -1) {
             favorites.push({
@@ -262,7 +354,7 @@ document.addEventListener('DOMContentLoaded', function() {
     updateFavoritesList();
 
     // Search form handler
-    searchForm.addEventListener('submit', async function(e) {
+    searchForm.addEventListener('submit', async function (e) {
         e.preventDefault();
         const pokemonName = pokemonInput.value.toLowerCase().trim();
         if (!pokemonName) return;
@@ -270,7 +362,7 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     // Clear search handler
-    pokemonInput.addEventListener('input', function(e) {
+    pokemonInput.addEventListener('input', function (e) {
         if (e.target.value === '') {
             document.querySelector('.search-container h1').textContent = 'What Pokemon are you looking for?';
             categoriesContainer.style.display = 'grid';
@@ -281,7 +373,7 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     // Navigation
-    document.querySelector('.nav_opt a[href="#favorites"]').addEventListener('click', function(e) {
+    document.querySelector('.nav_opt a[href="#favorites"]').addEventListener('click', function (e) {
         e.preventDefault();
         pokemonDetails.style.display = 'none';
         categoriesContainer.style.display = 'none';
@@ -289,7 +381,7 @@ document.addEventListener('DOMContentLoaded', function() {
         favoritesContainer.style.display = 'grid';
     });
 
-    document.querySelector('.nav_opt a[href="#"]').addEventListener('click', function(e) {
+    document.querySelector('.nav_opt a[href="#"]').addEventListener('click', function (e) {
         e.preventDefault();
         pokemonDetails.style.display = 'none';
         categoriesContainer.style.display = 'grid';
