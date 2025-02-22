@@ -19,11 +19,11 @@ document.addEventListener("DOMContentLoaded", function () {
         if (document.body.classList.contains("light-mode")) {
             toggleButton.style.backgroundColor = "rgb(138, 50, 50)"; // Dark red
             toggleButton.style.color = "white";
-            toggleButton.textContent = "🌙"; // Moon symbol
+            toggleButton.textContent = "🌞"; // Sun symbol
         } else {
             toggleButton.style.backgroundColor = "#ddd"; // Light gray
             toggleButton.style.color = "black";
-            toggleButton.textContent = "🌞"; // Sun symbol
+            toggleButton.textContent = "🌙"; // Moon symbol
         }
     }
 
